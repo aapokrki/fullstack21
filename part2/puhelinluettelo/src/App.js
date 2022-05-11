@@ -3,7 +3,7 @@ import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
 import axios from 'axios'
-
+import personsService from './services/persons'
 
 
 const App = () => {
@@ -15,17 +15,15 @@ const App = () => {
 
   useEffect(() => {
     console.log('effect')
-    axios
-      .get('http://localhost:3001/persons')
-      .then(response => {
+    personsService
+      .getAll()
+      .then(innitialPersons => {
         console.log('promise fulfilled')
-        setPersons(response.data)
+        setPersons(innitialPersons)
       })
   }, [])
+
   console.log('render', persons.length, 'notes')
-
-
-
 
 
   const addPerson = (event) => {
@@ -38,10 +36,26 @@ const App = () => {
         name: newName,
         number : newNumber
       }
-      setPersons(persons.concat(personObject));
-      setNewNumber('');
-      setNewName('');
+
+      personsService
+      .create(personObject)
+      .then(returnedPerson => {
+        setPersons(persons.concat(returnedPerson));
+        setNewNumber('');
+        setNewName('');
+      })
+      
     }
+  }
+
+  const deletePerson = id =>{
+
+    console.log("deletedpersono")
+    personsService
+    .deletePerson(id)
+    .then(() => {
+      setPersons(persons.filter(n => n.id !== id))
+    })
   }
 
   const handleNameInputChange = (event) => {
@@ -77,7 +91,7 @@ const App = () => {
       <h2>Numbers</h2>
 
       
-      <Persons personsToShow = {personsToShow}/>
+      <Persons personsToShow = {personsToShow} deletePerson = {(id) => deletePerson(id)}/>
       
 
     </div>
