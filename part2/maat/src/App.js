@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import CountryDisplay from './components/CountryDisplay'
+import CountryDetails from './components/CountryDetails'
 
 
 const App = () => {
@@ -35,8 +36,9 @@ const App = () => {
       <h2>COUNTRIES</h2>
       <p>find countries <input value = {newFilter} onChange = {handleFilterChange}/></p>
 
-     
-        <CountryDisplay key = {1} countriesToShow={countriesToShow}/>
+        <CountryDisplay key = {1} 
+          countriesToShow={countriesToShow}
+          handleFilterChange = {handleFilterChange}/>
       
     </div>
 
