@@ -1,4 +1,7 @@
-import React from "react"
+import axios from "axios"
+import React, { useEffect, useState } from "react"
+import CityWeather from './CityWeather'
+
 
 const Currency = ({currency}) => {
 
@@ -17,11 +20,12 @@ const Currency = ({currency}) => {
       </li>
     )
   }
-  
+
   const CountryDetails = ({country}) => {
   
+    
     const currencies = Object.values(country.currencies)
-  
+
     console.log(currencies);
   
     return(
@@ -50,6 +54,9 @@ const Currency = ({currency}) => {
   
         <img src={country.flags.png} />
         
+
+      <h3>Weather in {country.capital}</h3>
+        <CityWeather key={country.capital} city = {country.capital} />
       </div>
     )
   
