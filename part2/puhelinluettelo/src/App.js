@@ -19,17 +19,37 @@ const App = () => {
       .getAll()
       .then(innitialPersons => {
         console.log('promise fulfilled')
+        console.log(innitialPersons)
         setPersons(innitialPersons)
       })
-  }, [])
+  },[])
 
-  console.log('render', persons.length, 'notes')
+  //console.log('render', persons.length, 'people')
 
+  const changeNumber = (person) => {
+    const changedNumber = {...person, number: newNumber}
+    console.log(changeNumber)
+
+    personsService
+      .update(person.id, changedNumber)
+      .then(returnedPerson => {
+        console.log(returnedPerson)
+        setPersons(persons.map(p => p !== person ? person : returnedPerson))
+      })
+
+  }
 
   const addPerson = (event) => {
-    if(persons.filter(e => e.name === newName).length > 0){
-      window.alert(`${newName} is already added to phonebook`);
-        
+    
+    persons.forEach(e => console.log(e.name, e.id))
+    const person = persons.find(p => p.name.trim() === newName.trim())
+    if(typeof person != 'undefined'){
+      const changeTheNumber = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`);
+    
+      if(changeTheNumber){
+        changeNumber(person)
+      }
+
     }else{
       event.preventDefault()
       const personObject = {
