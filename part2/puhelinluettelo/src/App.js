@@ -8,12 +8,20 @@ const Notification = ({ message }) => {
   if (message === null) {
     return null
   }
-
-  return (
-    <div className="notification">
+  if(message.includes(`ERROR`)){
+    return (
+    <div className="error">
       {message}
     </div>
-  )
+    )
+  }else{
+    return (
+      <div className="notification">
+        {message}
+      </div>
+    )
+  }
+  
 
 }
 const App = () => {
@@ -54,6 +62,14 @@ const App = () => {
         setTimeout(() => {
           setNotificationMessage(null)
         },5000)
+      })
+      .catch(() => {
+        setNotificationMessage(
+          `ERROR: Person: '${changedPerson.name}' has already been removed from server`
+        )
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
       })
 
 
