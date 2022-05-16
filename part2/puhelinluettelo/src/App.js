@@ -2,15 +2,26 @@ import React, { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
-import axios from 'axios'
 import personsService from './services/persons'
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
 
+  return (
+    <div className="notification">
+      {message}
+    </div>
+  )
+
+}
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
 
 
   useEffect(() => {
@@ -19,23 +30,32 @@ const App = () => {
       .getAll()
       .then(innitialPersons => {
         console.log('promise fulfilled')
-        console.log(innitialPersons)
         setPersons(innitialPersons)
       })
   },[])
 
-  //console.log('render', persons.length, 'people')
 
   const changeNumber = (person) => {
-    const changedNumber = {...person, number: newNumber}
-    console.log(changeNumber)
+    const changedPerson = {...person, number: newNumber}
 
     personsService
-      .update(person.id, changedNumber)
+      .update(changedPerson)
       .then(returnedPerson => {
         console.log(returnedPerson)
-        setPersons(persons.map(p => p !== person ? person : returnedPerson))
+        console.log("returnedPerson")
+
+        setPersons(persons.map(p => p.id !== returnedPerson.id ? p : returnedPerson))
+
+        setNotificationMessage(`Changed ${changedPerson.name}'s number to ${newNumber}`)
+        
+        setNewNumber('');
+        setNewName('');
+        
+        setTimeout(() => {
+          setNotificationMessage(null)
+        },5000)
       })
+
 
   }
 
@@ -45,13 +65,14 @@ const App = () => {
     const person = persons.find(p => p.name.trim() === newName.trim())
     if(typeof person != 'undefined'){
       const changeTheNumber = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`);
-    
       if(changeTheNumber){
+        // Remember to preventDefault so that the site doesnt refresh
+        event.preventDefault()
         changeNumber(person)
       }
 
     }else{
-      event.preventDefault()
+      event.preventDefault() 
       const personObject = {
         name: newName,
         number : newNumber
@@ -61,20 +82,31 @@ const App = () => {
       .create(personObject)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson));
+
+        setNotificationMessage(`Added ${newName}`)
+        
         setNewNumber('');
         setNewName('');
+
+        setTimeout(() => {
+          setNotificationMessage(null)
+        },5000)
+        
       })
-      
     }
   }
 
   const deletePerson = id =>{
-
+    const personName =  persons.find(p => p.id === id).name
     console.log("deletedpersono")
     personsService
     .deletePerson(id)
     .then(() => {
       setPersons(persons.filter(n => n.id !== id))
+      setNotificationMessage(`Deleted ${personName}`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      },5000)
     })
   }
 
@@ -99,6 +131,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notificationMessage}/>
       <Filter value = {newFilter} onChange = {handleFilterInputChange}/>
     
       <h2>Add a new</h2>
