@@ -1,8 +1,9 @@
 const { response } = require('express')
 const express = require('express')
-const { type } = require('os')
+const { request } = require('http')
+const morgan = require('morgan')
 const app = express()
-app.use(express.json())
+
 
 
 let persons = [
@@ -28,82 +29,94 @@ let persons = [
   },
 ]
 
-  app.get('/', (request,response) => {
-    response.send('<h1>Hello World!</h1>')
-  })
+//3.7-3.8
+morgan.token('person', (request, response) =>{
+  const bodyString = JSON.stringify(request.body)
+  if(bodyString === '{}'){
+    return ' '
+  }
+  return JSON.stringify(request.body)
+})
 
-  // 3.1
-  app.get('/api/persons', (request, response) => {
-    response.json(persons)
-  })
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :person'))
 
-  //3.2
-  app.get('/info', (request,response) => {
-    const infoText = `<h2>Phonebook has info for ${persons.length} people</h2><h3>${new Date()}</h3>`
-    response.send(peopleInfo)
-  })
 
-  //3.3
-  app.get('/api/persons/:id', (request,response) => {
-      const id = Number(request.params.id)
-      const person = persons.find(person => person.id === id)
-      if(person){
-        response.json(person)
-      }else{
-        response.status(404).end()
-      }
-  })
+app.use(express.json())
+app.get('/', (request,response) => {
+  response.send('<h1>Hello World!</h1>')
+})
 
-  //3.4
-  app.delete('/api/persons/:id', (request,response) => {
+// 3.1
+app.get('/api/persons', (request, response) => {
+  response.json(persons)
+})
+
+//3.2
+app.get('/info', (request,response) => {
+  const infoText = `<h2>Phonebook has info for ${persons.length} people</h2><h3>${new Date()}</h3>`
+  response.send(peopleInfo)
+})
+
+//3.3
+app.get('/api/persons/:id', (request,response) => {
     const id = Number(request.params.id)
-    persons = persons.filter(person => person.id !== id)
-
-    response.status(204).end
-  })
-
-  //3.5
-  app.post('/api/persons', (request,response) => {
-    const body = request.body
-    console.log(body)
-    console.log(persons)
-    if(!body.name){
-      return response.status(400).json({
-        error: 'name missing'
-      })
+    const person = persons.find(person => person.id === id)
+    if(person){
+      response.json(person)
+    }else{
+      response.status(404).end()
     }
-    if(!body.number){
-      return response.status(400).json({
-        error: 'number missing'
-      })
-    }
+})
 
-    //3.6
-    if(persons.filter(p => p.name === body.name).length > 0){
-      return response.status(400).json({
-        error: 'name must be unique'
-      })
-    }
+//3.4
+app.delete('/api/persons/:id', (request,response) => {
+  const id = Number(request.params.id)
+  persons = persons.filter(person => person.id !== id)
 
-    const person = {
-      id: getRandomInt(0, 5000),
-      name: body.name,
-      number: body.number
-    }
+  response.status(204).end
+})
 
-    persons = persons.concat(person)
-    response.json(person)
-  })
+//3.5
+app.post('/api/persons', (request,response) => {
+  const body = request.body
 
-  const getRandomInt = ((min, max) => {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+  if(!body.name){
+    return response.status(400).json({
+      error: 'name missing'
+    })
+  }
+  if(!body.number){
+    return response.status(400).json({
+      error: 'number missing'
+    })
+  }
+
+  //3.6
+  if(persons.filter(p => p.name === body.name).length > 0){
+    return response.status(400).json({
+      error: 'name must be unique'
+    })
+  }
+
+  const person = {
+    id: getRandomInt(0, 5000),
+    name: body.name,
+    number: body.number
+  }
+
+  persons = persons.concat(person)
+  response.json(person)
+})
+
+const getRandomInt = ((min, max) => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+
+}) 
   
-  }) 
-    
 
-  const PORT = 3001
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-  })
+const PORT = 3001
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
