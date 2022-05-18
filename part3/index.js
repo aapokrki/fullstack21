@@ -24,29 +24,6 @@ app.use(cors())
 app.use(express.static('build'))
 
 
-let persons = [
-  {
-    id: 1,
-    name: "Arto Hellas",
-    number: "040-123456"
-  },
-  {
-    id: 2,
-    name: "Ada Lovelace",
-    number: "39-44-5354678"
-  },
-  {
-    id: 3,
-    name: "Aapo Kärki",
-    number: "0503752001"
-  },
-  {
-    id: 4,
-    name: "Joonas Kauppakassi",
-    number: "060-606666"
-  },
-]
-
 app.get('/', (request,response) => {
   response.send('<h1>Hello World!</h1>')
 })
@@ -59,16 +36,19 @@ app.get('/api/persons', (request, response) => {
 })
 
 //3.2
-app.get('/info', (request,response) => {
-  const infoText = `<h2>Phonebook has info for ${persons.length} people</h2><h3>${new Date()}</h3>`
-  response.send(peopleInfo)
+app.get('/info', (request,response,next) => {
+  Person.find({}).then(people => {
+    response.send(
+      `<h2>Phonebook has info for ${people.length} people</h2><h3>${new Date()}</h3>`
+    )
+  })
+  .catch(error => next(error))
 })
 
 //3.3
 app.get('/api/persons/:id', (request,response,next) => {
   Person.findById(request.params.id)
   .then(person => {
-    response.json(person)
     if(person){
       response.json(person)
     }else{
@@ -78,7 +58,7 @@ app.get('/api/persons/:id', (request,response,next) => {
   .catch(error => next(error))
 })
 
-//3.4
+// DELETE
 app.delete('/api/persons/:id', (request,response,next) => {
   Person.findByIdAndDelete(request.params.id)
     .then(result => {
@@ -87,9 +67,10 @@ app.delete('/api/persons/:id', (request,response,next) => {
     .catch(error => next(error))
 })
 
-//3.5
+// ADD PERSON
 app.post('/api/persons', (request,response) => {
   const body = request.body
+  //console.log(body.name)
 
   if(!body.name){
     return response.status(400).json({
@@ -102,22 +83,15 @@ app.post('/api/persons', (request,response) => {
     })
   }
 
-  //3.6
-  if(persons.filter(p => p.name === body.name).length > 0){
-    return response.status(400).json({
-      error: 'name must be unique'
-    })
-  }
 
   const person = new Person({
     name: body.name,
     number: body.number
   })
 
-  //persons = persons.concat(person)
   person.save().then(savedPerson =>{
     response.json(savedPerson)
-  })
+  }).catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
