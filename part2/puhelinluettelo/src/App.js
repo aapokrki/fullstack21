@@ -22,7 +22,6 @@ const Notification = ({ message }) => {
     )
   }
   
-
 }
 const App = () => {
   const [persons, setPersons] = useState([]) 
@@ -49,8 +48,6 @@ const App = () => {
     personsService
       .update(changedPerson)
       .then(returnedPerson => {
-        console.log(returnedPerson)
-        console.log("returnedPerson")
 
         setPersons(persons.map(p => p.id !== returnedPerson.id ? p : returnedPerson))
 
@@ -71,24 +68,23 @@ const App = () => {
           setNotificationMessage(null)
         }, 5000)
       })
-
-
   }
 
   const addPerson = (event) => {
     
+    event.preventDefault()
+
     persons.forEach(e => console.log(e.name, e.id))
+
     const person = persons.find(p => p.name.trim() === newName.trim())
+
     if(typeof person != 'undefined'){
       const changeTheNumber = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`);
       if(changeTheNumber){
         // Remember to preventDefault so that the site doesnt refresh
-        event.preventDefault()
         changeNumber(person)
       }
-
     }else{
-      event.preventDefault() 
       const personObject = {
         name: newName,
         number : newNumber
@@ -97,33 +93,41 @@ const App = () => {
       personsService
       .create(personObject)
       .then(returnedPerson => {
+        console.log(returnedPerson)
         setPersons(persons.concat(returnedPerson));
-
+        console.log(persons)
         setNotificationMessage(`Added ${newName}`)
-        
-        setNewNumber('');
-        setNewName('');
 
         setTimeout(() => {
           setNotificationMessage(null)
         },5000)
-        
+
+        setNewNumber('');
+        setNewName('');
       })
     }
   }
 
-  const deletePerson = id =>{
+  const deletePerson = (e,id)=>{
+
+    e.preventDefault()
     const personName =  persons.find(p => p.id === id).name
-    console.log("deletedpersono")
+
+    if(!window.confirm(`Delete ${personName}`)){
+      return null
+    } 
+
+    console.log(`deletedperson: ${personName}`)
+
     personsService
     .deletePerson(id)
-    .then(() => {
       setPersons(persons.filter(n => n.id !== id))
       setNotificationMessage(`Deleted ${personName}`)
+
       setTimeout(() => {
         setNotificationMessage(null)
       },5000)
-    })
+    
   }
 
   const handleNameInputChange = (event) => {
@@ -137,12 +141,11 @@ const App = () => {
   }
 
   const handleFilterInputChange = (event) => {
-    console.log(event.target.value)
     setNewFilter(event.target.value)
   }
-
+  
   const personsToShow = persons.filter(person => 
-                        person.name.toLowerCase().includes(newFilter.toLowerCase()))
+    person.name.toLowerCase().includes(newFilter.toLowerCase()))
 
   return (
     <div>
@@ -160,7 +163,7 @@ const App = () => {
       <h2>Numbers</h2>
 
       
-      <Persons personsToShow = {personsToShow} deletePerson = {(id) => deletePerson(id)}/>
+      <Persons personsToShow = {personsToShow} deletePerson = {deletePerson}/>
       
 
     </div>
