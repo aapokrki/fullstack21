@@ -4,25 +4,26 @@ import PersonForm from './components/PersonForm'
 import Filter from './components/Filter'
 import personsService from './services/persons'
 
-const Notification = ({ message }) => {
+const Notification = ({message}) => {
   if (message === null) {
     return null
   }
-  if(message.includes(`ERROR`)){
+
+  console.log(typeof message)
+  if(message.includes("ERROR") || message.includes("failed")){
     return (
-    <div className="error">
-      {message}
-    </div>
-    )
-  }else{
-    return (
-      <div className="notification">
+      <div className="error">
         {message}
       </div>
     )
   }
-  
+  return (
+    <div className="notification">
+      {message}
+    </div>
+  )
 }
+
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
@@ -51,7 +52,9 @@ const App = () => {
 
         setPersons(persons.map(p => p.id !== returnedPerson.id ? p : returnedPerson))
 
-        setNotificationMessage(`Changed ${changedPerson.name}'s number to ${newNumber}`)
+        setNotificationMessage(
+          `Changed ${changedPerson.name}'s number to ${newNumber}`
+          )
         
         setNewNumber('');
         setNewName('');
@@ -63,7 +66,7 @@ const App = () => {
       .catch(() => {
         setNotificationMessage(
           `ERROR: Person: '${changedPerson.name}' has already been removed from server`
-        )
+          )
         setTimeout(() => {
           setNotificationMessage(null)
         }, 5000)
@@ -71,7 +74,7 @@ const App = () => {
   }
 
   const addPerson = (event) => {
-    
+    // Remember to preventDefault so that the site doesnt refresh
     event.preventDefault()
 
     persons.forEach(e => console.log(e.name, e.id))
@@ -81,7 +84,6 @@ const App = () => {
     if(typeof person != 'undefined'){
       const changeTheNumber = window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`);
       if(changeTheNumber){
-        // Remember to preventDefault so that the site doesnt refresh
         changeNumber(person)
       }
     }else{
@@ -93,9 +95,7 @@ const App = () => {
       personsService
       .create(personObject)
       .then(returnedPerson => {
-        console.log(returnedPerson)
         setPersons(persons.concat(returnedPerson));
-        console.log(persons)
         setNotificationMessage(`Added ${newName}`)
 
         setTimeout(() => {
@@ -105,11 +105,17 @@ const App = () => {
         setNewNumber('');
         setNewName('');
       })
+      .catch(error => {
+        // pääset käsiksi palvelimen palauttamaan virheilmoitusolioon näin
+        setNotificationMessage(error.response.data.error)
+        setTimeout(() => {
+          setNotificationMessage(null)
+        }, 5000)
+      })
     }
   }
 
   const deletePerson = (e,id)=>{
-
     e.preventDefault()
     const personName =  persons.find(p => p.id === id).name
 
