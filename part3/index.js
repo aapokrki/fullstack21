@@ -4,7 +4,7 @@ const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
 const Person = require('./models/person')
-const { request, response } = require('express')
+const mongoose = require('mongoose')
 
 //3.7-3.8
 morgan.token('person', (request, response) =>{
@@ -39,7 +39,7 @@ app.get('/api/persons', (request, response) => {
 app.get('/info', (request,response,next) => {
   Person.find({}).then(people => {
     response.send(
-      `<h2>Phonebook has info for ${people.length} people</h2><h3>${new Date()}</h3>`
+      `<h2>Phonebook has info of ${people.length} people</h2><h3>${new Date()}</h3>`
     )
   })
   .catch(error => next(error))
@@ -70,25 +70,14 @@ app.delete('/api/persons/:id', (request,response,next) => {
 // ADD PERSON
 app.post('/api/persons', (request,response, next) => {
   const body = request.body
-  //console.log(body.name)
-
-  if(body.name === undefined){
-    return response.status(400).json({
-      error: 'name missing'
-    })
-  }
-  if(body.number === undefined){
-    return response.status(400).json({
-      error: 'number missing'
-    })
-  }
 
   const person = new Person({
     name: body.name,
     number: body.number
   })
 
-  person.save().then(savedPerson =>{
+  person.save()
+  .then(savedPerson =>{
     response.json(savedPerson)
   })
   .catch(error => next(error))
@@ -114,13 +103,16 @@ app.post('/api/persons', (request,response, next) => {
 
 app.put('/api/persons/:id', (request, response, next) => {
 
-    const {name, number} = request.body;
-  
+  const {name, number} = request.body
+
+    console.log(request.params.id)
+
     Person.findByIdAndUpdate(
       request.params.id, 
       {name, number},
       {new: true, runValidators: true, context: 'query'})
       .then(updatePerson => {
+        console.log(updatePerson)
         response.json(updatePerson)
       })
       .catch(error => next(error))
@@ -134,17 +126,18 @@ app.use(unknownEndpoint);
 
 
 const errorHandler = (error, request, response, next) => {
-  console.error(error.message);
+  console.log(error.name)
   if(error.name === 'CastError'){
     return response.status(400).send({error: 'malformatted id'})
   }else if (error.name === 'ValidationError') {
+    console.log(error.message)
     return response.status(400).json({ error: error.message })
   }
   next(error)
 }
 app.use(errorHandler);
 
-const PORT = process.env.PORT
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })

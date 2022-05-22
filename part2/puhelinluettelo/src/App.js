@@ -63,10 +63,9 @@ const App = () => {
           setNotificationMessage(null)
         },5000)
       })
-      .catch(() => {
-        setNotificationMessage(
-          `ERROR: Person: '${changedPerson.name}' has already been removed from server`
-          )
+      .catch(error => {
+        // pääset käsiksi palvelimen palauttamaan virheilmoitusolioon näin
+        setNotificationMessage(error.response.data.error)
         setTimeout(() => {
           setNotificationMessage(null)
         }, 5000)
