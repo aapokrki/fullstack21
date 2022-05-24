@@ -1,0 +1,16 @@
+POST http://localhost:3003/api/blogs
+Content-Type: application/json
+
+# {
+#     "title": "Karhumetsästys 101",
+#     "author": "Jorma Erä",
+#     "url": "https://www.youtube.com/",
+#     "likes": "1"
+# }
+
+{
+    "title": "Kiljunvalmistuksen alkeet",
+    "author": "Marjatta Marjajuoma",
+    "url": "https://www.marjatanmehu.fi/",
+    "likes": "999"
+}
