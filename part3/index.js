@@ -4,10 +4,9 @@ const morgan = require('morgan')
 const app = express()
 const cors = require('cors')
 const Person = require('./models/person')
-const mongoose = require('mongoose')
 
 //3.7-3.8
-morgan.token('person', (request, response) =>{
+morgan.token('person', (request) =>{
   const bodyString = JSON.stringify(request.body)
   if(bodyString === '{}'){
     return ' '
@@ -42,26 +41,26 @@ app.get('/info', (request,response,next) => {
       `<h2>Phonebook has info of ${people.length} people</h2><h3>${new Date()}</h3>`
     )
   })
-  .catch(error => next(error))
+    .catch(error => next(error))
 })
 
 // GET ONE PERSON
 app.get('/api/persons/:id', (request,response,next) => {
   Person.findById(request.params.id)
-  .then(person => {
-    if(person){
-      response.json(person)
-    }else{
-      response.status(404).end()
-    }
-  })
-  .catch(error => next(error))
+    .then(person => {
+      if(person){
+        response.json(person)
+      }else{
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
 })
 
 // DELETE PERSON
 app.delete('/api/persons/:id', (request,response,next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then(result => {
+    .then(() => {
       response.status(204).end()
     })
     .catch(error => next(error))
@@ -77,10 +76,10 @@ app.post('/api/persons', (request,response, next) => {
   })
 
   person.save()
-  .then(savedPerson =>{
-    response.json(savedPerson)
-  })
-  .catch(error => next(error))
+    .then(savedPerson =>{
+      response.json(savedPerson)
+    })
+    .catch(error => next(error))
 })
 
 // UPDATE NUMBER
@@ -105,24 +104,24 @@ app.put('/api/persons/:id', (request, response, next) => {
 
   const {name, number} = request.body
 
-    console.log(request.params.id)
+  console.log(request.params.id)
 
-    Person.findByIdAndUpdate(
-      request.params.id, 
-      {name, number},
-      {new: true, runValidators: true, context: 'query'})
-      .then(updatePerson => {
-        console.log(updatePerson)
-        response.json(updatePerson)
-      })
-      .catch(error => next(error))
+  Person.findByIdAndUpdate(
+    request.params.id, 
+    {name, number},
+    {new: true, runValidators: true, context: 'query'})
+    .then(updatePerson => {
+      console.log(updatePerson)
+      response.json(updatePerson)
+    })
+    .catch(error => next(error))
   
-  })
+})
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({error: 'unknown endpoint'})
 }
-app.use(unknownEndpoint);
+app.use(unknownEndpoint)
 
 
 const errorHandler = (error, request, response, next) => {
@@ -135,9 +134,9 @@ const errorHandler = (error, request, response, next) => {
   }
   next(error)
 }
-app.use(errorHandler);
+app.use(errorHandler)
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
