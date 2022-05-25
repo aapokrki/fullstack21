@@ -1,2 +1,5 @@
 .env
 node_modules
+fullstack21.git*
+.vscode
+.gitignore

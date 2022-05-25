@@ -8,9 +8,16 @@ Content-Type: application/json
 #     "likes": "1"
 # }
 
+# {
+#     "title": "Kiljunvalmistuksen alkeet",
+#     "author": "Marjatta Marjajuoma",
+#     "url": "https://www.marjatanmehu.fi/",
+#     "likes": "999"
+# }
+
 {
-    "title": "Kiljunvalmistuksen alkeet",
-    "author": "Marjatta Marjajuoma",
-    "url": "https://www.marjatanmehu.fi/",
-    "likes": "999"
+    "title": "asd",
+    "author": "ads",
+    "url": "asd",
+    "likes": "0"
 }
