@@ -1,0 +1,15 @@
+PUT http://localhost:3003/api/blogs/628d3c3453cfef121a113ad7
+Content-Type: application/json
+
+  {
+    "title": "Kiljunvalmistuksen alkeet",
+    "author": "Marjatta Marjajuoma",
+    "url": "https://www.marjatanmehu.fi/",
+    "likes": 1000,
+    "id": "628d3c3453cfef121a113ad7"
+  }
+
+  # {
+  #   "title": "karataka",
+  #   "author": "asd"
+  # }
