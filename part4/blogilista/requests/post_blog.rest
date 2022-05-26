@@ -18,6 +18,5 @@ Content-Type: application/json
 {
     "title": "asd",
     "author": "ads",
-    "url": "asd",
-    "likes": "0"
+    "url": "asd"
 }
