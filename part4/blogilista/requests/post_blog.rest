@@ -17,5 +17,6 @@ Content-Type: application/json
 
 {
     "title": "asd",
-    "author": "no url"
+    "author": "no url",
+    "url": "no url"
 }

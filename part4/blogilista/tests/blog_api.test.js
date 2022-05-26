@@ -83,7 +83,7 @@ test('give undefined likes a value of 0', async () => {
   expect(addedBlogInDb.likes).toEqual(0)
 })
 
-test('blog without title or url gives status 400', async () => {
+test('blog without title gives status 400', async () => {
   const noTitleBlog = {
     _id: "5a422a851b54a676234d17f7",
     author: "No title",
@@ -91,7 +91,13 @@ test('blog without title or url gives status 400', async () => {
     likes: 10,
     __v: 0
   }
+  await api
+    .post('/api/blogs')
+    .send(noTitleBlog)
+    .expect(400)
 
+})
+test('blog without url gives status 400', async () => {
   const noUrlBlog = {
     _id: "5a422a851b54a676234d17f7",
     title: "wtf",
@@ -99,12 +105,6 @@ test('blog without title or url gives status 400', async () => {
     likes: 10,
     __v: 0
   }
-
-  await api
-    .post('/api/blogs')
-    .send(noTitleBlog)
-    .expect(400)
-
     
   await api
   .post('/api/blogs')
@@ -112,6 +112,23 @@ test('blog without title or url gives status 400', async () => {
   .expect(400)
 })
 
+test('delete first blog', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  expect(blogsAtEnd).toHaveLength(
+    helper.initialBlogs.length - 1)
+
+  const titles = blogsAtEnd.map(b => b.title)
+  expect(titles).not.toContain(blogToDelete.title)
+
+})
 afterAll(() => {
   mongoose.connection.close()
 })
