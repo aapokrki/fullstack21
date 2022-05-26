@@ -4,14 +4,12 @@ const app = require('../app')
 const helper = require('./test_helper')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const { info } = require('../utils/logger')
 
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  let blogObject = new Blog(helper.initialBlogs[0])
-  await blogObject.save()
-  blogObject = new Blog(helper.initialBlogs[1])
-  await blogObject.save()
+  await Blog.insertMany(helper.initialBlogs)
 })
 
 
@@ -36,6 +34,32 @@ test('blogs identify with id', async () => {
     expect(id).toBeDefined()
   }
 })
+
+test('blog is added to db', async () => {
+  const newBlog = {
+    _id: "5a422a851b54a676234d17f7",
+    title: "How to add a blog from a test",
+    author: "Michael Chan",
+    url: "https://reactpatterns.com/",
+    likes: 7,
+    __v: 0
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  console.log(blogsAtEnd)
+  
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
+  const titles = blogsAtEnd.map(b => b.title)
+
+  expect(titles).toContainEqual('How to add a blog from a test')
+})
+
 
 afterAll(() => {
   mongoose.connection.close()
