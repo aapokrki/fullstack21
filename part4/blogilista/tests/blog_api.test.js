@@ -52,8 +52,6 @@ test('blog is added to db', async () => {
     .expect('Content-Type', /application\/json/)
 
   const blogsAtEnd = await helper.blogsInDb()
-  console.log(blogsAtEnd)
-
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
   const titles = blogsAtEnd.map(b => b.title)
 
@@ -83,10 +81,36 @@ test('give undefined likes a value of 0', async () => {
 
   expect(addedBlogInDb.likes).toBeDefined()
   expect(addedBlogInDb.likes).toEqual(0)
-
-
 })
 
+test('blog without title or url gives status 400', async () => {
+  const noTitleBlog = {
+    _id: "5a422a851b54a676234d17f7",
+    author: "No title",
+    url: "https://reactpatterns.com/",
+    likes: 10,
+    __v: 0
+  }
+
+  const noUrlBlog = {
+    _id: "5a422a851b54a676234d17f7",
+    title: "wtf",
+    author: "No URL",
+    likes: 10,
+    __v: 0
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(noTitleBlog)
+    .expect(400)
+
+    
+  await api
+  .post('/api/blogs')
+  .send(noUrlBlog)
+  .expect(400)
+})
 
 afterAll(() => {
   mongoose.connection.close()
