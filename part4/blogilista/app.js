@@ -1,13 +1,16 @@
 const config = require('./utils/config')
+const middleware = require('./utils/middleware')
+const logger = require('./utils/logger')
+
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const blogsRouter = require('./controllers/blogs.js')
-const middleware = require('./utils/middleware')
-const logger = require('./utils/logger')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
+
+const blogsRouter = require('./controllers/blogs.js')
 const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 
 logger.info('connecting to ', config.MONGODB_URI)
 
@@ -34,6 +37,7 @@ app.use(morgan(':method :url :status :res[content-length] - :response-time ms :b
 
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
 app.use(middleware.errorHandler)
 
