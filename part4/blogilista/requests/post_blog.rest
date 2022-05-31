@@ -1,19 +1,20 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkFhcG8iLCJpZCI6IjYyOTRlOGJlZWQzOGZiMWRiNWE5MmQ3NCIsImlhdCI6MTY1MzkzMjc3MywiZXhwIjoxNjUzOTM2MzczfQ.q41SFcwdASWRq_IBps1rueP1_-nt0ciBFfmTpDYHkE8
-
-{
-    "title": "Karhumetsästys 101",
-    "author": "Jorma Erä",
-    "url": "https://www.youtube.com/",
-    "likes": "1",
-    "user": "6294e8beed38fb1db5a92d74"
-}
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikpvcm1hIiwiaWQiOiI2Mjk1ZWMwNjVkM2Y1OWViNWFlYzY3MzciLCJpYXQiOjE2NTM5OTI0OTIsImV4cCI6MTY1Mzk5NjA5Mn0.LW7zyYxun36AEViTTdguW0kl5b9h2xvMkK7OSVwz09c
 
 # {
-#     "title": "Kiljunvalmistuksen alkeet",
-#     "author": "Marjatta Marjajuoma",
-#     "url": "https://www.marjatanmehu.fi/",
-#     "likes": "999"
+#     "title": "Karhumetsästys 101",
+#     "author": "Jorma Erä",
+#     "url": "https://www.youtube.com/",
+#     "likes": "1",
+#     "user": "6294e8beed38fb1db5a92d74"
 # }
+
+{
+    "title": "Kiljunvalmistuksen alkeet",
+    "author": "Marjatta Marjajuoma",
+    "url": "https://www.marjatanmehu.fi/",
+    "likes": "999",
+    "user": "6295ec065d3f59eb5aec6737"
+}
 

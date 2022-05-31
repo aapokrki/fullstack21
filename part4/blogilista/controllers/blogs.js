@@ -4,13 +4,6 @@ const {info, error} = require('../utils/logger')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
-// const getTokenFrom = request => {
-//   const authorization = request.get('authorization')
-//   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-//     return authorization.substring(7)
-//   }
-//   return null
-// }
 
 //ALL BLOGS
 blogsRouter.get('/', async (request, response) => {
@@ -64,9 +57,47 @@ blogsRouter.post('/', async (request, response, next) => {
 
 //DELETE BLOG
 blogsRouter.delete('/:id', async (request, response, next) => {
+
+  const token = request.token
+  const blogId = request.params.id
   try {
-    await Blog.findByIdAndDelete(request.params.id)
-    response.status(204).end()
+
+    const decodedToken = jwt.verify(token, process.env.SECRET)
+    if (!token || !decodedToken.id) {
+      return response.status(401).json({ error: 'token missing or invalid' })
+    }
+    const user = await User.findById(decodedToken.id)
+    info(user)
+    info(user.id)
+    info(typeof user)
+
+    const blog = await Blog.findById(blogId)
+    if(!blog){
+      return response.status(400).json({
+        error: `this blog does not exist in api/blogs`
+      })
+    }
+
+    if(blog.user.toString() === user.id){
+      await Blog.findByIdAndDelete(blogId)
+
+      const updatedUser = await User.findByIdAndUpdate(user.id, {
+        $pull: {blogs: {id: blogId} } }, {
+          upsert: false,
+          multi: true,
+          new: true
+        })
+      await updatedUser.save()
+        
+      
+      
+      response.status(204).end()
+
+    }else{
+      return response.status(400).json({
+        error: `this user (${user.username}) cannot delete this blog`
+      })
+    }
 
   } catch (error) {
     next(error)
