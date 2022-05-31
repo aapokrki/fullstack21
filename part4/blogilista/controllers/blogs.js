@@ -24,16 +24,9 @@ blogsRouter.get('/:id', async (request, response) => {
 //ADD BLOG
 blogsRouter.post('/', async (request, response, next) => {
   const body = request.body
-  const token = request.token
-
+  const user = request.user
   try {
-
-    const decodedToken = jwt.verify(token, process.env.SECRET)
-    if (!token || !decodedToken.id) {
-      return response.status(401).json({ error: 'token missing or invalid' })
-    }
-    const user = await User.findById(decodedToken.id)
-
+  
     const blog = new Blog({
       title: body.title,
       author: body.author,
@@ -60,27 +53,23 @@ blogsRouter.delete('/:id', async (request, response, next) => {
 
   const token = request.token
   const blogId = request.params.id
+  const user = request.user
+
   try {
-
-    const decodedToken = jwt.verify(token, process.env.SECRET)
-    if (!token || !decodedToken.id) {
-      return response.status(401).json({ error: 'token missing or invalid' })
-    }
-    const user = await User.findById(decodedToken.id)
-    info(user)
-    info(user.id)
-    info(typeof user)
-
     const blog = await Blog.findById(blogId)
+
     if(!blog){
       return response.status(400).json({
         error: `this blog does not exist in api/blogs`
       })
     }
 
-    if(blog.user.toString() === user.id){
+    if(blog.user.toString() === user.id.toString()){
+
+      // REMOVED BLOG FROM BLOGS
       await Blog.findByIdAndDelete(blogId)
 
+      // REMOVES BLOG FROM USER
       const updatedUser = await User.findByIdAndUpdate(user.id, {
         $pull: {blogs: {id: blogId} } }, {
           upsert: false,

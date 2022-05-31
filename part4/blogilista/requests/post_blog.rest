@@ -1,7 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikpvcm1hIiwiaWQiOiI2Mjk1ZWMwNjVkM2Y1OWViNWFlYzY3MzciLCJpYXQiOjE2NTM5OTI0OTIsImV4cCI6MTY1Mzk5NjA5Mn0.LW7zyYxun36AEViTTdguW0kl5b9h2xvMkK7OSVwz09c
-
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikpvcm1hIiwiaWQiOiI2Mjk1ZWMwNjVkM2Y1OWViNWFlYzY3MzciLCJpYXQiOjE2NTM5OTgyOTIsImV4cCI6MTY1NDAwMTg5Mn0.8uu7phQxmVil_jX4cnZ3w4hDazL9PLfdRb2zP9JMqUI
 # {
 #     "title": "Karhumetsästys 101",
 #     "author": "Jorma Erä",
