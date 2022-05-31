@@ -1,5 +1,9 @@
 const Blog = require('../models/blog');
 const User = require('../models/user')
+const bcrypt = require('bcrypt')
+const supertest = require('supertest')
+const app = require('../app')
+const api = supertest(app)
 
 const initialBlogs = [
   {
@@ -8,6 +12,7 @@ const initialBlogs = [
     author: "Jorma Erä",
     url: "https://www.youtube.com/",
     likes: 1,
+    user: "629684298216a36897de9db5", // Teppo
     __v: 0
   },
   {
@@ -16,9 +21,19 @@ const initialBlogs = [
     author: "Marjatta Marjajuoma",
     url: "https://www.marjatanmehu.fi/",
     likes: 999,
+    user: "629684298216a36897de9db5", // Teppo
     __v: 0
   }
 ]
+
+// Login with given user input. Return token
+const testLogin = async (user) => {
+  const res = await api
+    .post('/api/login')
+    .send(user)
+
+  return res.body.token
+}
 
 const blogsInDb = async () => {
   const blogs = await Blog.find({});
@@ -34,5 +49,6 @@ const usersInDb = async () => {
 module.exports = {
   initialBlogs,
   blogsInDb,
-  usersInDb
+  usersInDb,
+  testLogin
 }

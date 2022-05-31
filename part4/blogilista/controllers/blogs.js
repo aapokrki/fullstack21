@@ -3,7 +3,7 @@ const Blog = require('../models/blog')
 const {info, error} = require('../utils/logger')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
-
+const { userExtractor } = require('../utils/middleware')
 
 //ALL BLOGS
 blogsRouter.get('/', async (request, response) => {
@@ -22,7 +22,7 @@ blogsRouter.get('/:id', async (request, response) => {
   }
 })
 //ADD BLOG
-blogsRouter.post('/', async (request, response, next) => {
+blogsRouter.post('/',userExtractor, async (request, response, next) => {
   const body = request.body
   const user = request.user
   try {
@@ -49,7 +49,7 @@ blogsRouter.post('/', async (request, response, next) => {
 
 
 //DELETE BLOG
-blogsRouter.delete('/:id', async (request, response, next) => {
+blogsRouter.delete('/:id',userExtractor, async (request, response, next) => {
 
   const token = request.token
   const blogId = request.params.id
@@ -77,9 +77,6 @@ blogsRouter.delete('/:id', async (request, response, next) => {
           new: true
         })
       await updatedUser.save()
-        
-      
-      
       response.status(204).end()
 
     }else{
@@ -97,7 +94,6 @@ blogsRouter.delete('/:id', async (request, response, next) => {
 blogsRouter.put('/:id', async (request, response, next) => {
 
   const blog = request.body
-  console.log(blog)
 
   try {
     const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})

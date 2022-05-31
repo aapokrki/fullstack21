@@ -1,16 +1,37 @@
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
-const helper = require('./test_helper')
 const api = supertest(app)
-const Blog = require('../models/blog')
+const helper = require('./test_helper')
+
 const { info } = require('../utils/logger')
+const bcrypt = require('bcrypt')
+
+const Blog = require('../models/blog')
+const User = require('../models/user')
+
+let authToken = {};
+
+// Initialize users and login as Teppo, setting the authToken for tests
+beforeAll(async () => {
+  await User.deleteMany({})
+
+  const passwordHash = await bcrypt.hash('salasana', 10)
+  const matti = new User({_id: "62966f9f4f30d95f3be4f629", username: 'Matti', name: "Matti", passwordHash })
+  const teppo = new User({_id: "629684298216a36897de9db5", username: 'Teppo', name: "Teppo", passwordHash })
+
+  await matti.save()
+  await teppo.save()
+
+  return(authToken = await helper.testLogin({username: 'Teppo', password: "salasana"}))
+})
 
 describe('when there is initially some blogs saved', () => {
-
   beforeEach(async () => {
+    // INITIALIZE BLOGS
     await Blog.deleteMany({})
     await Blog.insertMany(helper.initialBlogs)
+
   })
   
   test('blogs are returned as json', async () => {
@@ -42,11 +63,15 @@ describe('when there is initially some blogs saved', () => {
         author: "Michael Chan",
         url: "https://reactpatterns.com/",
         likes: 7,
+        user: "629684298216a36897de9db5",
         __v: 0
       }
     
+      //const authToken = await helper.testLogin(({username: "Teppo", password: "salasana"}))
+      
       await api
         .post('/api/blogs')
+        .set("Authorization", `bearer ${authToken}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -64,17 +89,18 @@ describe('when there is initially some blogs saved', () => {
         title: "Blog with likes as undefined",
         author: "Joojoo Jorma",
         url: "https://reactpatterns.com/",
+        user: "629684298216a36897de9db5",
         __v: 0
       }
     
       await api
         .post('/api/blogs')
+        .set("Authorization", `bearer ${authToken}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
     
       const blogsAtEnd = await helper.blogsInDb()
-      //console.log(blogsAtEnd)
       
       expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length + 1)
       const addedBlogInDb = blogsAtEnd.find(b => b.title === newBlog.title)
@@ -88,11 +114,13 @@ describe('when there is initially some blogs saved', () => {
         _id: "5a422a851b54a676234d17f7",
         author: "No title",
         url: "https://reactpatterns.com/",
+        user: "629684298216a36897de9db5",
         likes: 10,
         __v: 0
       }
       await api
         .post('/api/blogs')
+        .set("Authorization", `bearer ${authToken}`)
         .send(noTitleBlog)
         .expect(400)
     
@@ -102,14 +130,34 @@ describe('when there is initially some blogs saved', () => {
         _id: "5a422a851b54a676234d17f7",
         title: "wtf",
         author: "No URL",
+        user: "629684298216a36897de9db5",
         likes: 10,
         __v: 0
       }
         
       await api
       .post('/api/blogs')
+      .set("Authorization", `bearer ${authToken}`)
       .send(noUrlBlog)
       .expect(400)
+    })
+    test('without autherization token returns 401', async () => {
+
+      const newBlog = {
+        _id: "5a422a851b54a676234d17f7",
+        title: "How to add a blog from a test",
+        author: "Michael Chan",
+        url: "https://reactpatterns.com/",
+        likes: 7,
+        user: "629684298216a36897de9db5",
+        __v: 0
+      }
+          
+      await api
+        .post('/api/blogs')
+        .set("Authorization", 'bearer ')
+        .send(newBlog)
+        .expect(401)
     })
   })
 
@@ -117,9 +165,10 @@ describe('when there is initially some blogs saved', () => {
     test('succeeds with status code 204 if id is valid', async () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogToDelete = blogsAtStart[0]
-    
+
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set("Authorization", `bearer ${authToken}`)
         .expect(204)
     
       const blogsAtEnd = await helper.blogsInDb()
@@ -157,8 +206,6 @@ describe('when there is initially some blogs saved', () => {
   
       const blogsAtStart = await helper.blogsInDb()
       const blogToUpdate = blogsAtStart[0]
-      console.log(blogToUpdate)
-      console.log(blogToUpdate.likes)
     
       const addFiveLikes = {
         likes: blogToUpdate.likes + 5
@@ -174,6 +221,61 @@ describe('when there is initially some blogs saved', () => {
     })
   })
 })
+
+// USERS
+describe('when there is initially one user at db', () => {
+  beforeEach(async () => {
+    await User.deleteMany({})
+
+    const passwordHash = await bcrypt.hash('sekret', 10)
+    const user = new User({ username: 'Matti', name: "Matti", passwordHash })
+    await user.save()
+  })
+
+  test('creation succeeds with a fresh username', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'mluukkai',
+      name: 'Matti Luukkainen',
+      password: 'salainen',
+    }
+
+    await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
+
+    const usernames = usersAtEnd.map(u => u.username)
+    expect(usernames).toContain(newUser.username)
+  })
+
+  test('creation fails with proper statuscode and message if username already taken', async () => {
+    const usersAtStart = await helper.usersInDb()
+
+    const newUser = {
+      username: 'Matti',
+      name: 'Superuser',
+      password: 'salainen',
+    }
+
+    const result = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(400)
+      .expect('Content-Type', /application\/json/)
+
+    expect(result.body.error).toContain('username must be unique')
+
+    const usersAtEnd = await helper.usersInDb()
+    expect(usersAtEnd).toHaveLength(usersAtStart.length)
+  })
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })

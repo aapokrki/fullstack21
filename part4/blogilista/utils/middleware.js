@@ -12,11 +12,13 @@ const tokenExtractor = (request, response, next) => {
 
 // USED BY CONTROLLER blogs.js IN .post and .delete
 const userExtractor = async (request, response, next) => {
+
+  if (!request.token) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+
   if(request.token){
     const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!request.token || !decodedToken.id) {
-      return response.status(401).json({ error: 'token missing or invalid' })
-    }
     request.user = await User.findById(decodedToken.id)
   }
   next();
