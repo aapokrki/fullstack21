@@ -118,8 +118,7 @@ const App = () => {
             <h3>Add a new blog:</h3>
             <BlogForm createBlog={addNote}/>
           </Togglable>
-
-
+          
           {blogList()}
         </div>
       }
