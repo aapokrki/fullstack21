@@ -14,12 +14,6 @@ const App = () => {
   const [user, setUser] = useState(null)
   const [notificationMessage, setNotificationMessage] = useState(null)
 
-  const [newBlogTitle, setNewBlogTitle] = useState('')
-  const [newBlogAuthor, setNewBlogAuthor] = useState('')
-  const [newBlogUrl, setNewBlogUrl] = useState('')
-
-  const [blogFormVisible, setBlogFormVisible] = useState(false)
-
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs(blogs)
@@ -35,6 +29,7 @@ const App = () => {
     }
   }, [])
 
+  // LOGIN
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -58,30 +53,25 @@ const App = () => {
       }, 5000)
     }
   }
+
+  // LOGOUT
   const handleLogout = async (event) => {
     event.preventDefault()
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
-
   }
 
-  // ADD BLOG
-  const addBlog = async (event) => {
-    event.preventDefault()
-
+  
+  /**
+   * Adds a blog
+   * @param {*} blogObject blogObject from BlogForm
+   */
+  const addNote = async (blogObject) => {
     try {
-        const blogObject = {
-        title: newBlogTitle,
-        author: newBlogAuthor,
-        url: newBlogUrl
-      }
 
       const returnedNote = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedNote))
-      setNewBlogTitle('')
-      setNewBlogAuthor('')
-      setNewBlogUrl('')
-      
+
       setNotificationMessage(`Blog: "${blogObject.title}" added to the bloglist`)
       setTimeout(() => {
         setNotificationMessage(null)
@@ -125,13 +115,7 @@ const App = () => {
 
           <Togglable buttonLabel="Create note">
             <h3>Add a new blog:</h3>
-            <BlogForm addBlog={addBlog}
-              newBlogTitle={newBlogTitle}
-              newBlogAuthor={newBlogAuthor}
-              newBlogUrl={newBlogUrl}
-              setNewBlogTitle={setNewBlogTitle}
-              setNewBlogAuthor={setNewBlogAuthor}
-              setNewBlogUrl={setNewBlogUrl}/>
+            <BlogForm createBlog={addNote}/>
           </Togglable>
 
 
