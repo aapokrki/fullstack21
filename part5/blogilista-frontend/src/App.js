@@ -4,13 +4,18 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
 import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState(null)
+  const [notificationMessage, setNotificationMessage] = useState(null)
+
+  const [newBlogTitle, setNewBlogTitle] = useState('') 
+  const [newBlogAuthor, setNewBlogAuthor] = useState('') 
+  const [newBlogUrl, setNewBlogUrl] = useState('') 
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -44,9 +49,9 @@ const App = () => {
       setUsername('')
       setPassword('')
     } catch (exception) {
-      setErrorMessage('wrong credentials')
+      setNotificationMessage('error: wrong credentials')
       setTimeout(() => {
-        setErrorMessage(null)
+        setNotificationMessage(null)
       }, 5000)
     }
   }
@@ -57,9 +62,40 @@ const App = () => {
 
   }
 
+  // ADD BLOG
+  const addBlog = async (event) => {
+    event.preventDefault()
+
+    try {
+
+      const blogObject = {
+        title: newBlogTitle,
+        author: newBlogAuthor,
+        url: newBlogUrl
+      }
+  
+      const returnedNote = await blogService.create(blogObject)
+      setBlogs(blogs.concat(returnedNote))
+      setNewBlogTitle('')
+      setNewBlogAuthor('')
+      setNewBlogUrl('')
+
+      setNotificationMessage(`Blog: "${blogObject.title}" added to the bloglist`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
+
+    } catch (error) {
+      setNotificationMessage('error: requires title and url')
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
+
+    }
+  }
+  
   const blogList = () => (
     <>
-      <h3>Logged in as "{user.name}" <button onClick={handleLogout}>logout</button></h3>
       {blogs.map(blog =>
           <Blog key={blog.id} blog={blog} />
         )}
@@ -71,7 +107,7 @@ const App = () => {
       {user === null ?
       <div>
         <h2>Login</h2>
-        <Notification message={errorMessage} />
+        <Notification message={notificationMessage} />
         <LoginForm  username={username} 
                     password={password} 
                     handleLogin={handleLogin} 
@@ -80,8 +116,18 @@ const App = () => {
       </div>
       :
       <div>
-        <h2>blogs</h2>
-        <Notification message={errorMessage} />
+        <h2>Blogilista</h2>
+        <h3>Logged in as "{user.name}" <button onClick={handleLogout}>logout</button></h3>
+
+        <Notification message={notificationMessage} />
+        <h3>Add a new blog:</h3>
+        <BlogForm addBlog={addBlog} 
+                  newBlogTitle={newBlogTitle} 
+                  newBlogAuthor={newBlogAuthor} 
+                  newBlogUrl={newBlogUrl}
+                  setNewBlogTitle ={setNewBlogTitle}
+                  setNewBlogAuthor ={setNewBlogAuthor}
+                  setNewBlogUrl ={setNewBlogUrl}/>
         {blogList()}
       </div>
       }
