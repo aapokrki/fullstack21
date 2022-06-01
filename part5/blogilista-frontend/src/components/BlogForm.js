@@ -1,6 +1,13 @@
 
-const BlogForm = ({ addBlog, newBlogTitle, newBlogAuthor, newBlogUrl, setNewBlogTitle, setNewBlogAuthor, setNewBlogUrl }) => (
-  <form onSubmit={addBlog}>
+const BlogForm = ({
+  addBlog,
+  newBlogTitle,
+  newBlogAuthor,
+  newBlogUrl,
+  setNewBlogTitle,
+  setNewBlogAuthor,
+  setNewBlogUrl }) => {
+  return (<form onSubmit={addBlog}>
 
     <div>title:
       <input
@@ -21,6 +28,6 @@ const BlogForm = ({ addBlog, newBlogTitle, newBlogAuthor, newBlogUrl, setNewBlog
     </div>
 
     <button type="submit">add blog</button>
-  </form>
-)
+  </form>)
+}
 export default BlogForm
