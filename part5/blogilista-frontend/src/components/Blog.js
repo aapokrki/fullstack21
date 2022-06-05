@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react' 
+import { useState } from 'react'
 
-const Blog = ({blog, username, addLike, deleteBlog}) => {
+const Blog = ({ blog, username, addLike, deleteBlog }) => {
   const [moreinfo, setMoreInfo] = useState(false)
   const [createdByCurrentUser, setCreatedByCurrentUser] = useState(false)
 
@@ -11,7 +11,7 @@ const Blog = ({blog, username, addLike, deleteBlog}) => {
   //   console.log(changedBlog)
 
   //   await blogService.update(blog.id, changedBlog)
-    
+
   // }
 
   const blogStyle = {
@@ -21,7 +21,7 @@ const Blog = ({blog, username, addLike, deleteBlog}) => {
     borderWidth: 1,
     marginBottom: 5
   }
-  
+
 
   // Hides the delete button the same way togglable does. May be unsafe, since a user
   // can access the button by just editin the html in the browser.
@@ -45,20 +45,20 @@ const Blog = ({blog, username, addLike, deleteBlog}) => {
         <button onClick={() => handleOnClick()}>hide</button>
         <div>URL: {blog.url}</div>
         <div>Likes: {blog.likes} <button onClick={addLike}>like</button></div>
-        <div>Added by: {blog.user ? blog.user.username : "unknown"}</div>
+        <div>Added by: {blog.user ? blog.user.username : 'unknown'}</div>
         <button style={showDeleteButton} onClick={() => deleteBlog()}>delete blog</button>
-      </div> 
-      ) 
+      </div>
+    )
   }
 
 
   return(
-  <div style={blogStyle}>
-    {blog.title} by {blog.author}
-    <button onClick={() => handleOnClick()}>view</button>
+    <div style={blogStyle}>
+      {blog.title} by {blog.author}
+      <button onClick={() => handleOnClick()}>view</button>
 
-  </div> 
-  ) 
+    </div>
+  )
 }
 
 export default Blog

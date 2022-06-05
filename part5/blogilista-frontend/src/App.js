@@ -88,10 +88,10 @@ const App = () => {
   }
 
   const addLike = async (blog) => {
-    const changedBlog = {...blog, likes: blog.likes + 1, user: blog.user.id}
+    const changedBlog = { ...blog, likes: blog.likes + 1, user: blog.user.id }
 
     // Puts user data back to field 'user', so that blogs dont get empty user field when liking
-    const returnedBlog = {...(await blogService.update(blog.id, changedBlog)), user: blog.user}
+    const returnedBlog = { ...(await blogService.update(blog.id, changedBlog)), user: blog.user }
     setBlogs(blogs.map(b => b.id !== returnedBlog.id ? b : returnedBlog))
   }
 
@@ -112,18 +112,18 @@ const App = () => {
   const blogList = () => {
 
     return(
-    <>
-      {blogs
-      .sort((a,b) => b.likes - a.likes)
-      .map(blog =>
-        <Blog key={blog.id} 
+      <>
+        {blogs
+          .sort((a,b) => b.likes - a.likes)
+          .map(blog =>
+            <Blog key={blog.id}
               blog={blog}
               username={user.username}
               addLike={() => addLike(blog)}
               deleteBlog={() => deleteBlog(blog)} />
-      )}
-    </>)
-    
+          )}
+      </>)
+
   }
 
   return (
@@ -141,7 +141,7 @@ const App = () => {
         :
         <div>
           <h2>Blogilista</h2>
-          <h3>Logged in as "{user.name}" <button onClick={handleLogout}>logout</button></h3>
+          <h3>Logged in as {user.name} <button onClick={handleLogout}>logout</button></h3>
 
           <Notification message={notificationMessage} />
 

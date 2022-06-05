@@ -26,7 +26,7 @@ const LoginForm = ({ username, password, handleLogin, setUsername, setPassword }
   )
 }
 
-LoginForm.propTypes = {  
+LoginForm.propTypes = {
   username: PropTypes.string.isRequired,
   password: PropTypes.string.isRequired,
   handleLogin: PropTypes.func.isRequired,
