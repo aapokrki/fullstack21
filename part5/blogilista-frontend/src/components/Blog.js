@@ -4,16 +4,6 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
   const [moreinfo, setMoreInfo] = useState(false)
   const [createdByCurrentUser, setCreatedByCurrentUser] = useState(false)
 
-  // const addLike = async (event) => {
-  //   event.preventDefault()
-  //   console.log(blog)
-  //   const changedBlog = {...blog, likes: blog.likes + 1}
-  //   console.log(changedBlog)
-
-  //   await blogService.update(blog.id, changedBlog)
-
-  // }
-
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -21,7 +11,6 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
     borderWidth: 1,
     marginBottom: 5
   }
-
 
   // Hides the delete button the same way togglable does. May be unsafe, since a user
   // can access the button by just editin the html in the browser.
@@ -40,7 +29,7 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
 
   if(moreinfo){
     return(
-      <div style={blogStyle}>
+      <div className='blog' style={blogStyle}>
         {blog.title} by {blog.author}
         <button onClick={() => handleOnClick()}>hide</button>
         <div>URL: {blog.url}</div>
@@ -53,7 +42,7 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
 
 
   return(
-    <div style={blogStyle}>
+    <div className='blog' style={blogStyle}>
       {blog.title} by {blog.author}
       <button onClick={() => handleOnClick()}>view</button>
 
