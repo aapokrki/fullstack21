@@ -57,4 +57,37 @@ describe('<Blog />', () => {
       'Likes: 1000'
     )
   })
+
+  test('like button registers and add likes', async () => {
+    const blog = {
+      title: 'Kiljunvalmistuksen alkeet',
+      author: 'Marjatta Marjajuoma',
+      url: 'https://www.marjatanmehu.fi/',
+      likes: 1000,
+      user: '6295ec065d3f59eb5aec6737'
+
+    }
+    // Render scene
+    const mockHandler = jest.fn()
+
+    render(
+      <Blog blog={blog} addLike={mockHandler} />
+    )
+
+    // Create user and click view button
+    const user = userEvent.setup()
+    const viewButton = screen.getByText('view')
+    await user.click(viewButton)
+
+
+    // Like button clicked twice
+    const likeButton = screen.getByText('like')
+    await user.click(likeButton)
+    await user.click(likeButton)
+
+    //addLike called twice
+    expect(mockHandler.mock.calls).toHaveLength(2)
+
+  })
+
 })
