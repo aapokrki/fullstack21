@@ -88,8 +88,11 @@ const App = () => {
   }
 
   const addLike = async (blog) => {
+    console.log(blog)
     const changedBlog = {...blog, likes: blog.likes + 1, user: blog.user.id}
-    const returnedBlog = await blogService.update(blog.id, changedBlog)
+
+    // Puts user data back to field 'user', so that blogs dont get empty user field when liking
+    const returnedBlog = {...(await blogService.update(blog.id, changedBlog)), user: blog.user}
     setBlogs(blogs.map(b => b.id !== returnedBlog.id ? b : returnedBlog))
   }
 
