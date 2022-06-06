@@ -7,14 +7,14 @@ const Notification = ({ message }) => {
 
   if(message.toLowerCase().includes('error')){
     return (
-      <div className="error">
+      <div id='notification' className="error">
         {message}
       </div>
     )
   }
   if(!message.toLowerCase().includes('error')){
     return (
-      <div className="notification">
+      <div id='notification' className="notification">
         {message}
       </div>
     )
