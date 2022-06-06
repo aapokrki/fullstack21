@@ -22,6 +22,8 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
 
     // Check if correct user when view button is pressed.
     // Is more efficient than checking all blogs at the start
+    console.log(username)
+    console.log(blog)
     if(username === blog.user.username){
       setCreatedByCurrentUser(true)
     }
@@ -35,7 +37,7 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
         <div>URL: {blog.url}</div>
         <div>Likes: {blog.likes} <button id='like-button' onClick={addLike}>like</button></div>
         <div>Added by: {blog.user ? blog.user.username : 'unknown'}</div>
-        <button style={showDeleteButton} onClick={() => deleteBlog()}>delete blog</button>
+        <button id='delete-button' style={showDeleteButton} onClick={() => deleteBlog()}>delete blog</button>
       </div>
     )
   }
