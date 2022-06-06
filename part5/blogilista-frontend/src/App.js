@@ -145,7 +145,7 @@ const App = () => {
 
           <Notification message={notificationMessage} />
 
-          <Togglable buttonLabel="Create note" ref={blogFormRef}>
+          <Togglable buttonLabel="Create blog" ref={blogFormRef}>
             <h3>Add a new blog:</h3>
             <BlogForm createBlog={addNote}/>
           </Togglable>
