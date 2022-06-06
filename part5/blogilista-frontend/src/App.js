@@ -67,11 +67,12 @@ const App = () => {
    * Adds a blog
    * @param {*} blogObject blogObject from BlogForm
    */
-  const addNote = async (blogObject) => {
+  const addBlog = async (blogObject) => {
     try {
       blogFormRef.current.toggleVisibility()
-      const returnedNote = await blogService.create(blogObject)
-      setBlogs(blogs.concat(returnedNote))
+      const returnedBlog = await blogService.create(blogObject)
+      console.log(returnedBlog)
+      setBlogs(blogs.concat(returnedBlog))
 
       setNotificationMessage(`Blog: "${blogObject.title}" added to the bloglist`)
       setTimeout(() => {
@@ -112,7 +113,7 @@ const App = () => {
   const blogList = () => {
 
     return(
-      <>
+      <div id='bloglist'>
         {blogs
           .sort((a,b) => b.likes - a.likes)
           .map(blog =>
@@ -122,7 +123,7 @@ const App = () => {
               addLike={() => addLike(blog)}
               deleteBlog={() => deleteBlog(blog)} />
           )}
-      </>)
+      </div>)
 
   }
 
@@ -147,7 +148,7 @@ const App = () => {
 
           <Togglable buttonLabel="Create blog" ref={blogFormRef}>
             <h3>Add a new blog:</h3>
-            <BlogForm createBlog={addNote}/>
+            <BlogForm createBlog={addBlog}/>
           </Togglable>
 
           {blogList()}

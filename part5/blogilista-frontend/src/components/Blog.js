@@ -31,9 +31,9 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
     return(
       <div className='blog' style={blogStyle}>
         {blog.title} by {blog.author}
-        <button onClick={() => handleOnClick()}>hide</button>
+        <button id='hide-button' onClick={() => handleOnClick()}>hide</button>
         <div>URL: {blog.url}</div>
-        <div>Likes: {blog.likes} <button onClick={addLike}>like</button></div>
+        <div>Likes: {blog.likes} <button id='like-button' onClick={addLike}>like</button></div>
         <div>Added by: {blog.user ? blog.user.username : 'unknown'}</div>
         <button style={showDeleteButton} onClick={() => deleteBlog()}>delete blog</button>
       </div>
@@ -44,7 +44,7 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
   return(
     <div className='blog' style={blogStyle}>
       {blog.title} by {blog.author}
-      <button onClick={() => handleOnClick()}>view</button>
+      <button id='view-button' onClick={() => handleOnClick()}>view</button>
 
     </div>
   )
