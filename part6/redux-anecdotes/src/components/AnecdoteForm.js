@@ -13,7 +13,7 @@ const AnecdoteForm = (props) => {
     event.target.anecdote.value = ''
     console.log(content)
     dispatch(createAnecdote(content))
-    dispatch(setNotification(`You added: ${content}`))
+    dispatch(setNotification(`You added: ${content}`, 5))
 
   }
 

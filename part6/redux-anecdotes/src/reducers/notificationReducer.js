@@ -2,12 +2,12 @@ import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = null
 
-export const setNotification = (message) => {
+export const setNotification = (message, time) => {
   return dispatch => {
     dispatch(showNotification(message))
     setTimeout(() => {
       dispatch(hideNotification())
-    }, 5000)
+    }, 1000 * time)
   }
 }
 
