@@ -1,24 +1,22 @@
-import { useDispatch } from "react-redux"
+import { connect } from "react-redux"
 import { updateFilter } from "../reducers/filterReducer"
 
-const Filter = () => {
-  const dispatch = useDispatch()
-
-  const handleChange = (event) => {
-    event.preventDefault()
-
-    const content = event.target.value
-    dispatch(updateFilter(content))  }
-
+const Filter = (props) => {
+  console.log(props)
   const style = {
     marginBottom: 10
   }
 
   return (
     <div style={style}>
-      filter <input onChange={handleChange} />
+      filter <input onChange={(event) => props.updateFilter(event.target.value)} />
     </div>
   )
 }
 
-export default Filter
+const mapDispatchToProps = {
+  updateFilter,
+}
+
+const ConnectedFilter = connect(() => {return {}},mapDispatchToProps)(Filter)
+export default ConnectedFilter
