@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react"
-import Blog from "./components/Blog"
+// import Blog from "./components/Blog"
 import blogService from "./services/blogs"
 import loginService from "./services/login"
 import Notification from "./components/Notification"
@@ -8,18 +8,24 @@ import BlogForm from "./components/BlogForm"
 import Togglable from "./components/Togglable"
 import { setNotification } from "./reducers/notificationReducer"
 import { useDispatch } from "react-redux"
+import { initializeBlogs } from "./reducers/blogReducer"
+import BlogList from "./components/BlogList"
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
+  // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState("Aap")
   const [password, setPassword] = useState("salasana")
   const [user, setUser] = useState(null)
 
   const dispatch = useDispatch()
 
+  // useEffect(() => {
+  //   blogService.getAll().then((blogs) => setBlogs(blogs))
+  // }, [])
+
   useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+    dispatch(initializeBlogs())
+  }, [dispatch])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser")
@@ -60,74 +66,18 @@ const App = () => {
 
   const blogFormRef = useRef()
 
-  /**
-   * Adds a blog
-   * @param {*} blogObject blogObject from BlogForm
-   */
-  const addBlog = async (blogObject) => {
-    try {
-      blogFormRef.current.toggleVisibility()
-      const returnedBlog = await blogService.create(blogObject)
-      console.log(returnedBlog)
-      setBlogs(blogs.concat(returnedBlog))
+  // const deleteBlog = async (blog) => {
+  //   console.log(blog)
+  //   if (!window.confirm(`Delete blog ${blog.title}`)) {
+  //     return null
+  //   }
 
-      dispatch(
-        setNotification(
-          `Blog: "${blogObject.title}" added to the bloglist`,
-          5,
-          "notification"
-        )
-      )
-    } catch (error) {
-      dispatch(setNotification("error: requires title and url", 5, "error"))
-    }
-  }
+  //   console.log(`deleted blog ${blog.title}`)
+  //   await blogService.deleteBlog(blog.id)
+  //   setBlogs(blogs.filter((b) => b.id !== blog.id))
 
-  const addLike = async (blog) => {
-    const changedBlog = {
-      ...blog,
-      likes: blog.likes + 1,
-      user: blog.user.id,
-    }
-
-    // Puts user data back to field 'user', so that blogs dont get empty user field when liking
-    const returnedBlog = {
-      ...(await blogService.update(blog.id, changedBlog)),
-      user: blog.user,
-    }
-    setBlogs(blogs.map((b) => (b.id !== returnedBlog.id ? b : returnedBlog)))
-  }
-
-  const deleteBlog = async (blog) => {
-    console.log(blog)
-    if (!window.confirm(`Delete blog ${blog.title}`)) {
-      return null
-    }
-
-    console.log(`deleted blog ${blog.title}`)
-    await blogService.deleteBlog(blog.id)
-    setBlogs(blogs.filter((b) => b.id !== blog.id))
-
-    dispatch(setNotification(`Deleted ${blog.title}`, 5, "notification"))
-  }
-
-  const blogList = () => {
-    return (
-      <div id="bloglist">
-        {blogs
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              username={user.username}
-              addLike={() => addLike(blog)}
-              deleteBlog={() => deleteBlog(blog)}
-            />
-          ))}
-      </div>
-    )
-  }
+  //   dispatch(setNotification(`Deleted ${blog.title}`, 5, "notification"))
+  // }
 
   return (
     <div>
@@ -155,10 +105,10 @@ const App = () => {
 
           <Togglable buttonLabel="Create blog" ref={blogFormRef}>
             <h3>Add a new blog:</h3>
-            <BlogForm createBlog={addBlog} />
+            <BlogForm />
           </Togglable>
 
-          {blogList()}
+          <BlogList user={user} />
         </div>
       )}
     </div>

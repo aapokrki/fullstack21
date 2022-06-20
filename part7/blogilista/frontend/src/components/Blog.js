@@ -1,8 +1,14 @@
 import { useState } from "react"
+import { useDispatch } from "react-redux/es/exports"
+import { likeBlog } from "../reducers/blogReducer"
+import { setNotification } from "../reducers/notificationReducer"
+import { removeBlog } from "../reducers/blogReducer"
 
-const Blog = ({ blog, username, addLike, deleteBlog }) => {
+const Blog = ({ blog, username }) => {
   const [moreinfo, setMoreInfo] = useState(false)
   const [createdByCurrentUser, setCreatedByCurrentUser] = useState(false)
+
+  const dispatch = useDispatch()
 
   const blogStyle = {
     paddingTop: 10,
@@ -12,21 +18,28 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
     marginBottom: 5,
   }
 
-  // Hides the delete button the same way togglable does. May be unsafe, since a user
-  // can access the button by just editin the html in the browser.
-  // They cannot edit it without the correct token so all good
   const showDeleteButton = { display: createdByCurrentUser ? "" : "none" }
 
   const handleOnClick = () => {
     setMoreInfo(!moreinfo)
 
-    // Check if correct user when view button is pressed.
-    // Is more efficient than checking all blogs at the start
-    console.log(username)
-    console.log(blog)
     if (username === blog.user.username) {
       setCreatedByCurrentUser(true)
     }
+  }
+
+  const handleLike = async () => {
+    dispatch(likeBlog(blog))
+    dispatch(setNotification(`You liked ${blog.title}`, 5, "notification"))
+  }
+
+  const handleDelete = async () => {
+    if (!window.confirm(`Delete blog ${blog.title}`)) {
+      return null
+    }
+
+    dispatch(removeBlog(blog.id))
+    dispatch(setNotification(`Deleted ${blog.title}`, 5, "notification"))
   }
 
   if (moreinfo) {
@@ -39,16 +52,12 @@ const Blog = ({ blog, username, addLike, deleteBlog }) => {
         <div>URL: {blog.url}</div>
         <div>
           Likes: {blog.likes}{" "}
-          <button id="like-button" onClick={addLike}>
+          <button id="like-button" onClick={() => handleLike()}>
             like
           </button>
         </div>
         <div>Added by: {blog.user ? blog.user.username : "unknown"}</div>
-        <button
-          id="delete-button"
-          style={showDeleteButton}
-          onClick={() => deleteBlog()}
-        >
+        <button id="delete-button" style={showDeleteButton} onClick={() => handleDelete()}>
           delete blog
         </button>
       </div>
