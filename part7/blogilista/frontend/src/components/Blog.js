@@ -37,39 +37,31 @@ const Blog = ({ blog, username }) => {
     if (!window.confirm(`Delete blog ${blog.title}`)) {
       return null
     }
-
     dispatch(removeBlog(blog.id))
     dispatch(setNotification(`Deleted ${blog.title}`, 5, "notification"))
-  }
-
-  if (moreinfo) {
-    return (
-      <div className="blog" style={blogStyle}>
-        {blog.title} by {blog.author}
-        <button id="hide-button" onClick={() => handleOnClick()}>
-          hide
-        </button>
-        <div>URL: {blog.url}</div>
-        <div>
-          Likes: {blog.likes}{" "}
-          <button id="like-button" onClick={() => handleLike()}>
-            like
-          </button>
-        </div>
-        <div>Added by: {blog.user ? blog.user.username : "unknown"}</div>
-        <button id="delete-button" style={showDeleteButton} onClick={() => handleDelete()}>
-          delete blog
-        </button>
-      </div>
-    )
   }
 
   return (
     <div className="blog" style={blogStyle}>
       {blog.title} by {blog.author}
       <button id="view-button" onClick={() => handleOnClick()}>
-        view
+        {moreinfo ? "hide" : "show"}
       </button>
+      {moreinfo ? (
+        <>
+          <div>URL: {blog.url}</div>
+          <div>
+            Likes: {blog.likes}{" "}
+            <button id="like-button" onClick={() => handleLike()}>
+              like
+            </button>
+          </div>
+          <div>Added by: {blog.user ? blog.user.username : "unknown"}</div>
+          <button id="delete-button" style={showDeleteButton} onClick={() => handleDelete()}>
+            delete blog
+          </button>
+        </>
+      ) : null}
     </div>
   )
 }
