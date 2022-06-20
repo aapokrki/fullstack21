@@ -6,13 +6,16 @@ import Notification from "./components/Notification"
 import LoginForm from "./components/LoginForm"
 import BlogForm from "./components/BlogForm"
 import Togglable from "./components/Togglable"
+import { setNotification } from "./reducers/notificationReducer"
+import { useDispatch } from "react-redux"
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("Aap")
+  const [password, setPassword] = useState("salasana")
   const [user, setUser] = useState(null)
-  const [notificationMessage, setNotificationMessage] = useState(null)
+
+  const dispatch = useDispatch()
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -44,10 +47,7 @@ const App = () => {
       setUsername("")
       setPassword("")
     } catch (exception) {
-      setNotificationMessage("error: wrong credentials")
-      setTimeout(() => {
-        setNotificationMessage(null)
-      }, 5000)
+      dispatch(setNotification("error: wrong credentials", 5, "error"))
     }
   }
 
@@ -71,17 +71,15 @@ const App = () => {
       console.log(returnedBlog)
       setBlogs(blogs.concat(returnedBlog))
 
-      setNotificationMessage(
-        `Blog: "${blogObject.title}" added to the bloglist`
+      dispatch(
+        setNotification(
+          `Blog: "${blogObject.title}" added to the bloglist`,
+          5,
+          "notification"
+        )
       )
-      setTimeout(() => {
-        setNotificationMessage(null)
-      }, 5000)
     } catch (error) {
-      setNotificationMessage("error: requires title and url")
-      setTimeout(() => {
-        setNotificationMessage(null)
-      }, 5000)
+      dispatch(setNotification("error: requires title and url", 5, "error"))
     }
   }
 
@@ -107,11 +105,10 @@ const App = () => {
     }
 
     console.log(`deleted blog ${blog.title}`)
-
     await blogService.deleteBlog(blog.id)
-
     setBlogs(blogs.filter((b) => b.id !== blog.id))
-    setNotificationMessage(`Deleted ${blog.title}`)
+
+    dispatch(setNotification(`Deleted ${blog.title}`, 5, "notification"))
   }
 
   const blogList = () => {
@@ -137,7 +134,7 @@ const App = () => {
       {user === null ? (
         <div>
           <h2>Login</h2>
-          <Notification message={notificationMessage} />
+          <Notification />
           <LoginForm
             username={username}
             password={password}
@@ -150,11 +147,11 @@ const App = () => {
         <div>
           <h2>Blogilista</h2>
           <h3>
-            Logged in as {user.name}{" "}
+            Logged in as {user.name}
             <button onClick={handleLogout}>logout</button>
           </h3>
 
-          <Notification message={notificationMessage} />
+          <Notification />
 
           <Togglable buttonLabel="Create blog" ref={blogFormRef}>
             <h3>Add a new blog:</h3>
