@@ -7,8 +7,6 @@ const Notification = () => {
     return null
   }
 
-  console.log(notification.message)
-
   return <div className={notification.style}>{notification.message}</div>
 }
 

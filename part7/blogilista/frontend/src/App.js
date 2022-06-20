@@ -1,27 +1,24 @@
 import { useState, useEffect, useRef } from "react"
 // import Blog from "./components/Blog"
-import blogService from "./services/blogs"
 import loginService from "./services/login"
 import Notification from "./components/Notification"
 import LoginForm from "./components/LoginForm"
 import BlogForm from "./components/BlogForm"
 import Togglable from "./components/Togglable"
 import { setNotification } from "./reducers/notificationReducer"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { initializeBlogs } from "./reducers/blogReducer"
 import BlogList from "./components/BlogList"
+import { setUserToken, setUser } from "./reducers/userReducer"
 
 const App = () => {
   // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState("Aap")
   const [password, setPassword] = useState("salasana")
-  const [user, setUser] = useState(null)
+  //const [user, setUser] = useState(null)
 
   const dispatch = useDispatch()
-
-  // useEffect(() => {
-  //   blogService.getAll().then((blogs) => setBlogs(blogs))
-  // }, [])
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
     dispatch(initializeBlogs())
@@ -31,8 +28,7 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem("loggedBlogappUser")
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+      dispatch(setUserToken(user))
     }
   }, [])
 
@@ -47,9 +43,7 @@ const App = () => {
       })
 
       window.localStorage.setItem("loggedBlogappUser", JSON.stringify(user))
-
-      blogService.setToken(user.token)
-      setUser(user)
+      dispatch(setUserToken(user))
       setUsername("")
       setPassword("")
     } catch (exception) {
@@ -61,23 +55,10 @@ const App = () => {
   const handleLogout = async (event) => {
     event.preventDefault()
     window.localStorage.removeItem("loggedBlogappUser")
-    setUser(null)
+    dispatch(setUser(null))
   }
 
   const blogFormRef = useRef()
-
-  // const deleteBlog = async (blog) => {
-  //   console.log(blog)
-  //   if (!window.confirm(`Delete blog ${blog.title}`)) {
-  //     return null
-  //   }
-
-  //   console.log(`deleted blog ${blog.title}`)
-  //   await blogService.deleteBlog(blog.id)
-  //   setBlogs(blogs.filter((b) => b.id !== blog.id))
-
-  //   dispatch(setNotification(`Deleted ${blog.title}`, 5, "notification"))
-  // }
 
   return (
     <div>
@@ -108,7 +89,7 @@ const App = () => {
             <BlogForm />
           </Togglable>
 
-          <BlogList user={user} />
+          <BlogList />
         </div>
       )}
     </div>

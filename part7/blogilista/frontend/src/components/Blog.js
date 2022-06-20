@@ -3,12 +3,13 @@ import { useDispatch } from "react-redux/es/exports"
 import { likeBlog } from "../reducers/blogReducer"
 import { setNotification } from "../reducers/notificationReducer"
 import { removeBlog } from "../reducers/blogReducer"
+import { useSelector } from "react-redux/es/exports"
 
-const Blog = ({ blog, username }) => {
+const Blog = ({ blog }) => {
   const [moreinfo, setMoreInfo] = useState(false)
-  const [createdByCurrentUser, setCreatedByCurrentUser] = useState(false)
 
   const dispatch = useDispatch()
+  const user = useSelector((state) => state.user)
 
   const blogStyle = {
     paddingTop: 10,
@@ -18,15 +19,7 @@ const Blog = ({ blog, username }) => {
     marginBottom: 5,
   }
 
-  const showDeleteButton = { display: createdByCurrentUser ? "" : "none" }
-
-  const handleOnClick = () => {
-    setMoreInfo(!moreinfo)
-
-    if (username === blog.user.username) {
-      setCreatedByCurrentUser(true)
-    }
-  }
+  const showDeleteButton = { display: user.username === blog.user.username ? "" : "none" }
 
   const handleLike = async () => {
     dispatch(likeBlog(blog))
@@ -44,7 +37,7 @@ const Blog = ({ blog, username }) => {
   return (
     <div className="blog" style={blogStyle}>
       {blog.title} by {blog.author}
-      <button id="view-button" onClick={() => handleOnClick()}>
+      <button id="view-button" onClick={() => setMoreInfo(!moreinfo)}>
         {moreinfo ? "hide" : "show"}
       </button>
       {moreinfo ? (
