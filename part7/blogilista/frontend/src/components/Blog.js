@@ -50,9 +50,11 @@ const Blog = ({ blog }) => {
             </button>
           </div>
           <div>Added by: {blog.user ? blog.user.username : "unknown"}</div>
-          <button id="delete-button" style={showDeleteButton} onClick={() => handleDelete()}>
-            delete blog
-          </button>
+          <div>
+            <button id="delete-button" style={showDeleteButton} onClick={() => handleDelete()}>
+              delete blog
+            </button>
+          </div>
         </>
       ) : null}
     </div>

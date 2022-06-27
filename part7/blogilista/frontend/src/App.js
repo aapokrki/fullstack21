@@ -5,20 +5,24 @@ import Notification from "./components/Notification"
 import LoginForm from "./components/LoginForm"
 import BlogForm from "./components/BlogForm"
 import Togglable from "./components/Togglable"
+import User from "./components/User"
 import { setNotification } from "./reducers/notificationReducer"
 import { useDispatch, useSelector } from "react-redux"
 import { initializeBlogs } from "./reducers/blogReducer"
 import BlogList from "./components/BlogList"
 import { setUserToken, setUser } from "./reducers/userReducer"
-
+import { Routes, Route, Link, useNavigate } from "react-router-dom"
+import { getUsers } from "./reducers/usersReducer"
+import Table from "react-bootstrap/Table"
 const App = () => {
-  // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState("Aap")
   const [password, setPassword] = useState("salasana")
-  //const [user, setUser] = useState(null)
 
+  const navigate = useNavigate()
   const dispatch = useDispatch()
+
   const user = useSelector((state) => state.user)
+  const users = useSelector((state) => state.users)
 
   useEffect(() => {
     dispatch(initializeBlogs())
@@ -30,6 +34,10 @@ const App = () => {
       const user = JSON.parse(loggedUserJSON)
       dispatch(setUserToken(user))
     }
+  }, [])
+
+  useEffect(() => {
+    dispatch(getUsers())
   }, [])
 
   // LOGIN
@@ -46,6 +54,7 @@ const App = () => {
       dispatch(setUserToken(user))
       setUsername("")
       setPassword("")
+      navigate("/")
     } catch (exception) {
       dispatch(setNotification("error: wrong credentials", 5, "error"))
     }
@@ -60,8 +69,26 @@ const App = () => {
 
   const blogFormRef = useRef()
 
+  const UserList = () => {
+    console.log(users)
+    if (!users) {
+      return null
+    }
+    return (
+      <div>
+        <Table striped>
+          <thead>
+            {users.slice().map((user) => (
+              <User key={user.id} user={user} />
+            ))}
+          </thead>
+        </Table>
+      </div>
+    )
+  }
+
   return (
-    <div>
+    <div className="container">
       {user === null ? (
         <div>
           <h2>Login</h2>
@@ -76,20 +103,31 @@ const App = () => {
         </div>
       ) : (
         <div>
+          <Link to="/users">users</Link>
           <h2>Blogilista</h2>
           <h3>
             Logged in as {user.name}
-            <button onClick={handleLogout}>logout</button>
+            <Link to="/login">
+              <button onClick={handleLogout}>logout</button>
+            </Link>
           </h3>
 
           <Notification />
-
-          <Togglable buttonLabel="Create blog" ref={blogFormRef}>
-            <h3>Add a new blog:</h3>
-            <BlogForm />
-          </Togglable>
-
-          <BlogList />
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <div>
+                  <Togglable buttonLabel="Create blog" ref={blogFormRef}>
+                    <h3>Add a new blog:</h3>
+                    <BlogForm />
+                  </Togglable>
+                  <BlogList />
+                </div>
+              }
+            />
+            <Route path="/users" element={<UserList />} />
+          </Routes>
         </div>
       )}
     </div>

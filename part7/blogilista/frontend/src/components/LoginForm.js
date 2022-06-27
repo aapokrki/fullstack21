@@ -1,12 +1,6 @@
 import PropTypes from "prop-types"
 
-const LoginForm = ({
-  username,
-  password,
-  handleLogin,
-  setUsername,
-  setPassword,
-}) => {
+const LoginForm = ({ username, password, handleLogin, setUsername, setPassword }) => {
   return (
     <form onSubmit={handleLogin}>
       <div>

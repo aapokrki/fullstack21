@@ -12,7 +12,7 @@ const userSlice = createSlice({
   },
 })
 
-export const { setUser } = userSlice.actions
+export const { setUser, getAllUsers } = userSlice.actions
 
 export const setUserToken = (user) => {
   return async (dispatch) => {
