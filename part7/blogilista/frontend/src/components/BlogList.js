@@ -1,19 +1,24 @@
 import { useSelector } from "react-redux"
-import Blog from "./Blog"
-
+import Table from "react-bootstrap/Table"
+import { Link } from "react-router-dom"
 const BlogList = () => {
   const blogs = useSelector((state) => state.blogs)
   console.log(blogs)
   return (
     <div>
-      <div>
-        {blogs
-          .slice()
-          .sort((a, b) => b.likes - a.likes)
-          .map((blog) => (
-            <Blog key={blog.id} blog={blog} />
+      <Table striped>
+        <tbody>
+          {blogs.slice().map((blog) => (
+            <tr key={blog.id}>
+              <td>
+                <Link to={`/blogs/${blog.id}`}>
+                  {blog.title} by ({blog.author})
+                </Link>
+              </td>
+            </tr>
           ))}
-      </div>
+        </tbody>
+      </Table>
     </div>
   )
 }

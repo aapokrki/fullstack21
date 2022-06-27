@@ -5,7 +5,6 @@ import Notification from "./components/Notification"
 import LoginForm from "./components/LoginForm"
 import BlogForm from "./components/BlogForm"
 import Togglable from "./components/Togglable"
-import User from "./components/User"
 import { setNotification } from "./reducers/notificationReducer"
 import { useDispatch, useSelector } from "react-redux"
 import { initializeBlogs } from "./reducers/blogReducer"
@@ -14,6 +13,9 @@ import { setUserToken, setUser } from "./reducers/userReducer"
 import { Routes, Route, Link, useNavigate } from "react-router-dom"
 import { getUsers } from "./reducers/usersReducer"
 import Table from "react-bootstrap/Table"
+import User from "./components/User"
+import Blog from "./components/Blog"
+
 const App = () => {
   const [username, setUsername] = useState("Aap")
   const [password, setPassword] = useState("salasana")
@@ -22,7 +24,6 @@ const App = () => {
   const dispatch = useDispatch()
 
   const user = useSelector((state) => state.user)
-  const users = useSelector((state) => state.users)
 
   useEffect(() => {
     dispatch(initializeBlogs())
@@ -54,7 +55,7 @@ const App = () => {
       dispatch(setUserToken(user))
       setUsername("")
       setPassword("")
-      navigate("/")
+      navigate("/blogs")
     } catch (exception) {
       dispatch(setNotification("error: wrong credentials", 5, "error"))
     }
@@ -69,6 +70,8 @@ const App = () => {
 
   const blogFormRef = useRef()
 
+  const users = useSelector((state) => state.users)
+
   const UserList = () => {
     console.log(users)
     if (!users) {
@@ -76,12 +79,20 @@ const App = () => {
     }
     return (
       <div>
+        <h3>USERS</h3>
         <Table striped>
-          <thead>
+          <tbody>
             {users.slice().map((user) => (
-              <User key={user.id} user={user} />
+              <tr key={user.id}>
+                <td>
+                  <Link to={`/users/${user.id}`}>
+                    {user.name} ({user.username})
+                  </Link>
+                </td>
+                <td>{user.blogs.length} blogs</td>
+              </tr>
             ))}
-          </thead>
+          </tbody>
         </Table>
       </div>
     )
@@ -103,7 +114,10 @@ const App = () => {
         </div>
       ) : (
         <div>
-          <Link to="/users">users</Link>
+          <Link style={{ padding: 5 }} to="/users">
+            users
+          </Link>
+          <Link to="/blogs">blogs</Link>
           <h2>Blogilista</h2>
           <h3>
             Logged in as {user.name}
@@ -115,9 +129,10 @@ const App = () => {
           <Notification />
           <Routes>
             <Route
-              path="/"
+              path="/blogs"
               element={
                 <div>
+                  <h3>BLOGS</h3>
                   <Togglable buttonLabel="Create blog" ref={blogFormRef}>
                     <h3>Add a new blog:</h3>
                     <BlogForm />
@@ -127,6 +142,8 @@ const App = () => {
               }
             />
             <Route path="/users" element={<UserList />} />
+            <Route path="/users/:id" element={<User />} />
+            <Route path="/blogs/:id" element={<Blog />} />
           </Routes>
         </div>
       )}
